@@ -28,3 +28,9 @@ Git Bash 安装：C:/Users/andy.wang/AppData/Local/Programs/Git/bin/bash.exe。�
 原始命令与请求体、响应均保存在 evidence/；不保存授权设备码或 token。
 
 C08 归因更正：此前 xallor 私有 lab 的失败是实验脚本问题（含字面量反引号 n 导致的 YAML 错误），不归因书稿；日志未取得的后续 run 不推断具体根因。本次正常与异常路径分别按云端实际结果记录。
+
+最终归因审查（2026-11-19）：
+- 已修复/澄清：C07 的 `build.py` 漏复制、xallor 私有 C08 的 YAML 字面量 `n` 实验错误；公开 lab 的干净 C08、required check 和 Ruleset 复测均提供正向/预期失败证据。
+- 预期失败：重复 URL 的 catalog 校验失败；这是故意无效输入，不是书稿缺陷。
+- 资格阻断：私有仓库 branch protection/Pages 计划限制、Projects CLI scope/二次验证、Copilot Cloud Agent 资格、gh-aw 云端模型/凭据。
+- 仍未声称通过：同一失败 PR 修复后转绿、C12 云端事件链、C11 Cloud Agent。
