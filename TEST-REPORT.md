@@ -1,7 +1,7 @@
 # 公开仓库补测报告
 
 执行日期：2026-11-19，Asia/Shanghai。账号 WangKangAandy；仓库 [WangKangAandy/modern-github-book-lab](https://github.com/WangKangAandy/modern-github-book-lab)，public、ADMIN。
-书稿基线 `22827850b579c4c1151e4589ec0763915af8045b`，只读。范围包括 C02 分支保护、C04 Projects、C08 Resource CI 补测证据、C09 Pages 及回滚、C12 本地 gh-aw 验证与编译记录；不代表全书全部实验通过。
+书稿云端复测基线为 `a5cfb1ea1ad9a52b24e10c6b2a4d6ccba376b72d`（包含 action major 更新）；更早的 C02/C04/C08/C09/C12 证据保留原始 run 和提交上下文，后续书稿文字修订不自动继承为已实测。范围包括 C02 分支保护、C04 Projects、C08 Resource CI 补测证据、C09 Pages 及回滚、C12 本地 gh-aw 验证与编译记录；不代表全书全部实验通过。
 
 ## 执行摘要
 
@@ -119,6 +119,16 @@ main protection 已实际设置 `required_status_checks.contexts=["Check resourc
 - `gh run download 44480532820 --name github-pages` 真正下载 tar，比较其中 provenance 与线上 JSON 完全相同：[验证](evidence/c09-artifact-verification.json)、[artifact 元数据](evidence/c09-main-artifact.json)。
 - PR 的 provenance 使用合成 merge SHA（`43af6a9…`），不同于 head SHA 是 pull_request 事件语义，不是部署来源错误；main 部署按合并提交核对。
 - 这是书稿自定义 provenance 文件，不是签名 attestation。Release 发布和非 main 部署拒绝不在本次执行声明中。
+
+## Action major 更新复测
+
+书稿在上述基线中将 Actions 版本统一到当前稳定主版本：checkout v7、setup-python v7、upload-artifact v7、download-artifact v8、upload-pages-artifact v5、deploy-pages v5。公开 lab 从 `main` 创建 `test/action-major-updates`，通过 PR #15 合并后重新观察两条 workflow：
+
+- [PR #15](https://github.com/WangKangAandy/modern-github-book-lab/pull/15) 已合并；
+- [Resource CI run 44521491951](https://github.com/WangKangAandy/modern-github-book-lab/actions/runs/44521491951) 成功；
+- [Publish resource site run 44521491891](https://github.com/WangKangAandy/modern-github-book-lab/actions/runs/44521491891) 成功，包含 release Environment 审批后的 Pages 部署。
+
+这证明版本更新后的当前 YAML 在公开 lab 中可以运行；不代表所有附录动作、不同操作系统或其他账号计划都已验证。
 
 ## C12：本地校验与编译，云端仍阻断
 
