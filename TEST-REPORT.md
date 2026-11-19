@@ -1,7 +1,7 @@
 # 公开仓库补测报告
 
 执行日期：2026-11-19，Asia/Shanghai。账号 WangKangAandy；仓库 [WangKangAandy/modern-github-book-lab](https://github.com/WangKangAandy/modern-github-book-lab)，public、ADMIN。
-书稿基线 `22827850b579c4c1151e4589ec0763915af8045b`，只读。此次范围仅 C02 分支保护、C04 Projects、C09 Pages 及回滚；不代表全书全部实验通过。
+书稿基线 `22827850b579c4c1151e4589ec0763915af8045b`，只读。范围包括 C02 分支保护、C04 Projects、C08 Resource CI 补测证据、C09 Pages 及回滚；不代表全书全部实验通过。
 
 ## 执行摘要
 
@@ -9,6 +9,7 @@
 |---|---|---|
 | C02 | 通过：main 保护创建成功，管理员直接 push 被拒绝，提交保留到分支、恢复 main、经 PR 合并 | A+B：API 回执、Git Bash 输出、PR #1；只测 classic branch protection，未另测 ruleset |
 | C04 | 网页最小实验通过；CLI scope 刷新仍因二次验证阻断 | A：项目 #1、Issue #4、截图；网页创建/状态修改/关闭，未声称 CLI Projects 成功 |
+| C08 | Resource CI 成功路径与重复 URL 拒绝通过；同一失败 PR 修复转绿、required check 门禁未验证 | A：PR #6 成功 run 44490990698，两 job 成功；PR #7 两 workflow 按预期失败，已关闭并删分支 |
 | C09 | 通过本次范围：原样书稿 workflow 的 PR build、main deploy、release 审批、artifact、页面 provenance、临时标题及 revert 回滚 | A+B：六个 PR/push runs、三次 HTTP 页面、SHA、审批和 artifact 下载核对；没有签名证明或 Release 发布声明 |
 
 公开仓库消除了上次私有仓库分支保护 403 和 Pages 422 的计划限制。Projects 的 CLI scope 与仓库可见性是两回事；浏览器既有登录可操作，并不说明 CLI 已获新权限。
@@ -43,6 +44,24 @@
 
 项目默认 private，未更改可见性，因此其链接需要账号权限；[截图](evidence/c04-project-done.png)与 [Issue 回执](evidence/c04-issue.json)可复核。未测试 Projects CLI 写入、全部视图、sub-issue/dependency。
 
+## C08：干净复测与预期失败（新增）
+
+本节由另一测试窗口执行后提供 run/PR 编号，本窗口通过 GitHub API 和失败日志重新核实，未冒称在本窗口重新触发运行。
+
+| 场景 | PR / run | 实际结果与 SHA |
+|---|---|---|
+| 正常资源与 artifact | [PR #6](https://github.com/WangKangAandy/modern-github-book-lab/pull/6) / [Resource CI 44490990698](https://github.com/WangKangAandy/modern-github-book-lab/actions/runs/44490990698) | success；Check resources、Verify artifact 两 job 均 success；head SHA `b856427780addf7520f12d9f8eaeace58405a947` |
+| 重复 docs.github.com URL | [PR #7](https://github.com/WangKangAandy/modern-github-book-lab/pull/7) / [Resource CI 44491808019](https://github.com/WangKangAandy/modern-github-book-lab/actions/runs/44491808019) | failure；Validate catalog 失败，后续 build/upload 和 Verify artifact 跳过；head SHA `091b03f48bdf0d627e7d23a5b7b31c02e0271d9c` |
+| 同一无效清单触发 Pages 检查 | [Pages 44491807943](https://github.com/WangKangAandy/modern-github-book-lab/actions/runs/44491807943) | failure；Validate catalog 失败，Deploy site 跳过；同一 head SHA |
+
+成功路径包含 unittest、清单校验、构建、上传，以及另一 job 下载 artifact 并执行 Verify artifact contents。PR #6 已合并，merge SHA `878ff1788cad5d83214705a5d7cbbc945b60bf02`。
+
+失败原文：`Catalog error: Line 5: duplicate URL`；`Process completed with exit code 1.`。这是故意无效数据被正确拒绝，不是书稿缺陷。PR #7 CLOSED、未合并；远端 `test/c08-failure` 查询 HTTP 404，符合已删除状态。没有把“关闭失败 PR”记成“修复后转绿”。本次查询 main protection 的 required_status_checks 无配置值，因此不宣称 C08 required check 门禁已完成。
+
+证据：[成功 jobs](evidence/c08-success-run.json)、[CI 失败 jobs](evidence/c08-expected-failure-run.json)、[失败日志](evidence/c08-expected-failure-log.txt)、[Pages 失败 jobs](evidence/c08-pages-expected-failure-run.json)、[PR 状态](evidence/c08-prs.json)、[分支删除回执](evidence/c08-deleted-branch.txt)。
+
+归因修正：此前 xallor 私有 lab 的 C08 实验使用了自行改写的脚本，还出现将字面量反引号 n 写入 YAML 的执行错误；该轮失败属于实验脚本问题，不归因书稿。对于后来仅返回 `log not found` 的具体 run，不补造未取得的运行时根因；以本次干净复测作为书稿流程的有效验证依据。
+
 ## C09：Pages、审批与来源
 
 从书稿 C09 的 YAML 代码块原样提取 `.github/workflows/pages.yml`，复制 C07 五个资产到根目录：`.gitignore`、`build.py`、`catalog.py`、`resources.csv`、`test_catalog.py`。
@@ -75,7 +94,8 @@
 
 - 临时 Project 已关闭，Issue #4 已关闭；三个实验 PR 合并并删除远端分支。
 - main 保护、release Environment、Pages 保留供审计和后续实验；不涉及真实 secrets 或付费资源。
-- 证据报告用独立文档 PR 合并；报告提交使用 `[skip ci]`，避免仅记录证据又触发额外部署。线上源码 SHA 因而停留在已验证的回滚提交，未把报告 commit 当作部署 commit。
+- 证据报告用独立文档 PR 合并；报告提交使用 `[skip ci]`，避免仅记录证据又触发额外部署。C09 表格记录的是当时实际验证的部署快照，后续 C08 提交不改变这些历史证据；不把报告 commit 当作部署 commit。
+- C08 PR #6 已合并；故意失败的 PR #7 已关闭、分支已删除。临时 resources.csv.bak 与 resources.csv 的 SHA256 完全相同，整理日志时清除此重复备份，不提交 scratch。
 - 没有修改书稿工作树；本地下载产物位于本会话 work/，不提交嵌套仓库、缓存或 scratch。
 
 ## 对上次报告的更正
@@ -84,3 +104,4 @@
 2. `gh run --log` 的 `log not found` 单独不能证明私有仓库日志资格限制；上次没有取得 annotations 根因，结论应仅写“日志未取得，原因未确认”。
 3. 本次 Projects 网页成功修正了“Projects 整体阻断”的表述，剩余仅 CLI 新 scope 授权未完成。
 4. 上次未实测的 C01 网页、C03 全部恢复命令、C06 表单加载、Agent 资格等不因本次三项补测而变为通过。
+5. C08 私有 lab 初测的实验脚本错误不归因书稿；公开仓库干净复测确认正常 CI/artifact 路径成功、重复 URL 被拒绝。未完成项仍保留，不将 C08 全章一概标成通过。
