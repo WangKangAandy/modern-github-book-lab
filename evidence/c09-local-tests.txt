@@ -1,0 +1,15 @@
+test_page_escapes_text_and_attribute_values (test_catalog.CatalogTests.test_page_escapes_text_and_attribute_values) ... ok
+test_reads_utf8_and_csv_quoting (test_catalog.CatalogTests.test_reads_utf8_and_csv_quoting) ... ok
+test_rejects_blank_field (test_catalog.CatalogTests.test_rejects_blank_field) ... ok
+test_rejects_duplicate_url (test_catalog.CatalogTests.test_rejects_duplicate_url) ... ok
+test_rejects_empty_catalog (test_catalog.CatalogTests.test_rejects_empty_catalog) ... ok
+test_rejects_extra_column (test_catalog.CatalogTests.test_rejects_extra_column) ... ok
+test_rejects_non_web_url (test_catalog.CatalogTests.test_rejects_non_web_url) ... ok
+test_rejects_url_without_host (test_catalog.CatalogTests.test_rejects_url_without_host) ... ok
+test_requires_expected_header (test_catalog.CatalogTests.test_requires_expected_header) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.052s
+
+OK
+Built site/index.html with 2 resources
