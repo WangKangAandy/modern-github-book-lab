@@ -1,0 +1,13 @@
+Check resources	Validate catalog	﻿2026-11-19T09:07:24.8480150Z ##[group]Run python catalog.py resources.csv
+Check resources	Validate catalog	2026-11-19T09:07:24.8481660Z ^[[36;1mpython catalog.py resources.csv^[[0m
+Check resources	Validate catalog	2026-11-19T09:07:24.8532526Z shell: /usr/bin/bash -e {0}
+Check resources	Validate catalog	2026-11-19T09:07:24.8533243Z env:
+Check resources	Validate catalog	2026-11-19T09:07:24.8533978Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+Check resources	Validate catalog	2026-11-19T09:07:24.8535394Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+Check resources	Validate catalog	2026-11-19T09:07:24.8536821Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+Check resources	Validate catalog	2026-11-19T09:07:24.8538084Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+Check resources	Validate catalog	2026-11-19T09:07:24.8539369Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+Check resources	Validate catalog	2026-11-19T09:07:24.8540659Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+Check resources	Validate catalog	2026-11-19T09:07:24.8541955Z ##[endgroup]
+Check resources	Validate catalog	2026-11-19T09:07:24.8845621Z Catalog error: Line 4: duplicate URL
+Check resources	Validate catalog	2026-11-19T09:07:24.8893345Z ##[error]Process completed with exit code 1.
