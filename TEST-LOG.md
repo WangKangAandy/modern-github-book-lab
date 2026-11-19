@@ -18,4 +18,3 @@
 Git Bash 安装：C:/Users/andy.wang/AppData/Local/Programs/Git/bin/bash.exe。直接将其作为执行器 shell 时命中了 WSL shim（无发行版）；改为 PowerShell 显式启动该安装路径后成功运行同一 bash 脚本。这是本机执行器路径差异，不是书稿 Git 命令失败。
 
 原始命令与请求体、响应均保存在 evidence/；不保存授权设备码或 token。
-
