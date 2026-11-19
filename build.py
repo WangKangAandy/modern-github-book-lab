@@ -17,7 +17,7 @@ def render_page(resources):
         '<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width, initial-scale=1">'
         '<title>Learning Resource Navigator</title></head><body>\n'
-        '<h1>学习资源导航</h1>\n<ul>\n'
+        '<h1>临时标题</h1>\n<ul>\n'
         + "\n".join(items)
         + "\n</ul>\n</body></html>\n"
     )
