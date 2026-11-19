@@ -1,7 +1,7 @@
 # 公开仓库补测报告
 
 执行日期：2026-11-19，Asia/Shanghai。账号 WangKangAandy；仓库 [WangKangAandy/modern-github-book-lab](https://github.com/WangKangAandy/modern-github-book-lab)，public、ADMIN。
-书稿基线 `22827850b579c4c1151e4589ec0763915af8045b`，只读。范围包括 C02 分支保护、C04 Projects、C08 Resource CI 补测证据、C09 Pages 及回滚；不代表全书全部实验通过。
+书稿基线 `22827850b579c4c1151e4589ec0763915af8045b`，只读。范围包括 C02 分支保护、C04 Projects、C08 Resource CI 补测证据、C09 Pages 及回滚、C12 本地 gh-aw 验证与编译记录；不代表全书全部实验通过。
 
 ## 执行摘要
 
@@ -11,6 +11,7 @@
 | C04 | 网页最小实验通过；CLI scope 刷新仍因二次验证阻断 | A：项目 #1、Issue #4、截图；网页创建/状态修改/关闭，未声称 CLI Projects 成功 |
 | C08 | Resource CI 成功路径、重复 URL 拒绝及 required check 门禁均已验证通过；同一失败 PR 修复转绿未验证 | A：PR #6 两 job 成功；PR #7 故意失败；PR #9 在 Check resources 必须通过且 strict=true 时失败，API 显示 blocked、merged=false |
 | C09 | 通过本次范围：原样书稿 workflow 的 PR build、main deploy、release 审批、artifact、页面 provenance、临时标题及 revert 回滚 | A+B：六个 PR/push runs、三次 HTTP 页面、SHA、审批和 artifact 下载核对；没有签名证明或 Release 发布声明 |
+| C12 | 本地 validate/compile 通过（执行窗口交接）；云端模型/凭据仍受账号资格阻断 | B：gh-aw v1.2.2，1 workflow、0 warnings、143.1 KB；本窗口直接复核版本与清理，未重新编译；没有云端 run 或事件链成功证据 |
 
 公开仓库消除了上次私有仓库分支保护 403 和 Pages 422 的计划限制。Projects 的 CLI scope 与仓库可见性是两回事；浏览器既有登录可操作，并不说明 CLI 已获新权限。
 
@@ -102,6 +103,21 @@ main protection 已实际设置 `required_status_checks.contexts=["Check resourc
 - PR 的 provenance 使用合成 merge SHA（`43af6a9…`），不同于 head SHA 是 pull_request 事件语义，不是部署来源错误；main 部署按合并提交核对。
 - 这是书稿自定义 provenance 文件，不是签名 attestation。Release 发布和非 main 部署拒绝不在本次执行声明中。
 
+## C12：本地校验与编译，云端仍阻断
+
+执行窗口在 WangKangAandy lab 安装 gh-aw v1.2.2，使用书稿 C12 最小 staged workflow，实际执行：
+
+```bash
+gh aw validate resource-review
+gh aw compile resource-review
+```
+
+交接结果：两条命令均成功；编译汇总为 **1 workflow、0 warnings、143.1 KB**。临时 workflow 和 lock 已删除。
+
+本窗口实测 `gh aw version` 得到 `gh aw version v1.2.2`，扩展列表确认 `github/gh-aw v1.2.2`；更新报告前工作树干净，workflows 目录仅 ci.yml/pages.yml。编译命令的成功来自执行窗口交接，本窗口未重跑、也未取得原始 stdout，完整来源说明见 [本地实验交接记录](evidence/c12-local-handoff.md)。
+
+C12 结论由“未安装扩展”更新为“本地工具链验证/编译通过，云端模型/凭据仍为账号资格阻断”。**本地编译不证明模型调用、staged 审批或事件链成功**。本次没有云端 run URL，也未收到资格阻断原始报错文本；不编造错误原文或把本地结果升级为云端通过。
+
 ## 清理与保留
 
 - 临时 Project 已关闭，Issue #4 已关闭；三个实验 PR 合并并删除远端分支。
@@ -109,6 +125,7 @@ main protection 已实际设置 `required_status_checks.contexts=["Check resourc
 - 证据报告用独立文档 PR 合并；此前无 required check 时使用 `[skip ci]`。配置 required check 后，本次报告 PR 正常运行 CI 并在 Check resources 成功后合并，不跳过必需检查。C09 表格记录的是当时实际验证的部署快照，后续提交不改变历史证据。
 - C08 PR #6 已合并；故意失败的 PR #7 已关闭、分支已删除。临时 resources.csv.bak 与 resources.csv 的 SHA256 完全相同，整理日志时清除此重复备份，不提交 scratch。
 - C08 required check 实验 PR #9 已关闭、分支已删除；main 的 Check resources strict 保护保留。
+- C12 临时 resource-review workflow/lock 已清理；gh-aw v1.2.2 保留安装，没有新增模型凭据或 secrets。
 - 没有修改书稿工作树；本地下载产物位于本会话 work/，不提交嵌套仓库、缓存或 scratch。
 
 ## 对上次报告的更正
@@ -118,3 +135,4 @@ main protection 已实际设置 `required_status_checks.contexts=["Check resourc
 3. 本次 Projects 网页成功修正了“Projects 整体阻断”的表述，剩余仅 CLI 新 scope 授权未完成。
 4. 上次未实测的 C01 网页、C03 全部恢复命令、C06 表单加载、Agent 资格等不因本次三项补测而变为通过。
 5. C08 私有 lab 初测的实验脚本错误不归因书稿；公开仓库干净复测确认正常 CI/artifact 路径成功、重复 URL 被拒绝。未完成项仍保留，不将 C08 全章一概标成通过。
+6. C12 “gh-aw 未安装”的旧状态已过时；现为 v1.2.2 本地 validate/compile 成功，云端仍阻断。C08 required check 已通过验证，保留 PR #9 的 blocked/merged=false 与配置证据。
