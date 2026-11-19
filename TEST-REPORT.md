@@ -9,7 +9,7 @@
 |---|---|---|
 | C02 | 通过：main 保护创建成功，管理员直接 push 被拒绝，提交保留到分支、恢复 main、经 PR 合并 | A+B：API 回执、Git Bash 输出、PR #1；只测 classic branch protection，未另测 ruleset |
 | C04 | 网页最小实验通过；CLI scope 刷新仍因二次验证阻断 | A：项目 #1、Issue #4、截图；网页创建/状态修改/关闭，未声称 CLI Projects 成功 |
-| C08 | Resource CI 成功路径与重复 URL 拒绝通过；同一失败 PR 修复转绿、required check 门禁未验证 | A：PR #6 成功 run 44490990698，两 job 成功；PR #7 两 workflow 按预期失败，已关闭并删分支 |
+| C08 | Resource CI 成功路径、重复 URL 拒绝及 required check 门禁均已验证通过；同一失败 PR 修复转绿未验证 | A：PR #6 两 job 成功；PR #7 故意失败；PR #9 在 Check resources 必须通过且 strict=true 时失败，API 显示 blocked、merged=false |
 | C09 | 通过本次范围：原样书稿 workflow 的 PR build、main deploy、release 审批、artifact、页面 provenance、临时标题及 revert 回滚 | A+B：六个 PR/push runs、三次 HTTP 页面、SHA、审批和 artifact 下载核对；没有签名证明或 Release 发布声明 |
 
 公开仓库消除了上次私有仓库分支保护 403 和 Pages 422 的计划限制。Projects 的 CLI scope 与仓库可见性是两回事；浏览器既有登录可操作，并不说明 CLI 已获新权限。
@@ -56,7 +56,19 @@
 
 成功路径包含 unittest、清单校验、构建、上传，以及另一 job 下载 artifact 并执行 Verify artifact contents。PR #6 已合并，merge SHA `878ff1788cad5d83214705a5d7cbbc945b60bf02`。
 
-失败原文：`Catalog error: Line 5: duplicate URL`；`Process completed with exit code 1.`。这是故意无效数据被正确拒绝，不是书稿缺陷。PR #7 CLOSED、未合并；远端 `test/c08-failure` 查询 HTTP 404，符合已删除状态。没有把“关闭失败 PR”记成“修复后转绿”。本次查询 main protection 的 required_status_checks 无配置值，因此不宣称 C08 required check 门禁已完成。
+失败原文：`Catalog error: Line 5: duplicate URL`；`Process completed with exit code 1.`。这是故意无效数据被正确拒绝，不是书稿缺陷。PR #7 CLOSED、未合并；远端 `test/c08-failure` 查询 HTTP 404，符合已删除状态。没有把“关闭失败 PR”记成“修复后转绿”。PR #7 归档时 required_status_checks 尚未配置；后续 PR #9 已完成下述 required check 验证，替代此前“门禁未验证”的结论。
+
+### Required check 补测：已通过验证
+
+main protection 已实际设置 `required_status_checks.contexts=["Check resources"]`、`strict=true`，绑定 GitHub Actions app_id=15368，管理员也受保护规则约束。本窗口重新读取 [配置回执](evidence/c08-required-protection.json) 确认设置。
+
+- [PR #9](https://github.com/WangKangAandy/modern-github-book-lab/pull/9) 的 `test/c08-required-check` 分支加入重复 docs.github.com URL；head SHA `bdfbb99af3d0829839ae1c71085566877143625c`。
+- [Resource CI run 44493493607](https://github.com/WangKangAandy/modern-github-book-lab/actions/runs/44493493607) failure，Check resources 在 Validate catalog 失败；Verify artifact skipped。[jobs 证据](evidence/c08-required-ci-failure.json)、[失败原文](evidence/c08-required-failure-log.txt)。
+- [Pages run 44493493780](https://github.com/WangKangAandy/modern-github-book-lab/actions/runs/44493493780) failure。[jobs 证据](evidence/c08-required-pages-failure.json)。
+- 实验窗口在失败后观察 PR API `mergeable_state=blocked`、`merged=false`；本窗口在 PR 关闭后重新读取 API，仍返回上述值及 `state=closed`。[PR 回执](evidence/c08-required-pr9.json)。区分历史阻断观察与当前关闭状态，不冒称再次尝试合并。
+- PR #9 已关闭、未合并；远端分支 GET 返回 404，[清理证据](evidence/c08-required-branch-deleted.txt)。
+
+结论：C08 required check 配置与失败时阻止合并已验证。没有强推、管理员 bypass 或关闭规则来合并失败变更；同一失败 PR 修复转绿仍未执行。
 
 证据：[成功 jobs](evidence/c08-success-run.json)、[CI 失败 jobs](evidence/c08-expected-failure-run.json)、[失败日志](evidence/c08-expected-failure-log.txt)、[Pages 失败 jobs](evidence/c08-pages-expected-failure-run.json)、[PR 状态](evidence/c08-prs.json)、[分支删除回执](evidence/c08-deleted-branch.txt)。
 
@@ -94,8 +106,9 @@
 
 - 临时 Project 已关闭，Issue #4 已关闭；三个实验 PR 合并并删除远端分支。
 - main 保护、release Environment、Pages 保留供审计和后续实验；不涉及真实 secrets 或付费资源。
-- 证据报告用独立文档 PR 合并；报告提交使用 `[skip ci]`，避免仅记录证据又触发额外部署。C09 表格记录的是当时实际验证的部署快照，后续 C08 提交不改变这些历史证据；不把报告 commit 当作部署 commit。
+- 证据报告用独立文档 PR 合并；此前无 required check 时使用 `[skip ci]`。配置 required check 后，本次报告 PR 正常运行 CI 并在 Check resources 成功后合并，不跳过必需检查。C09 表格记录的是当时实际验证的部署快照，后续提交不改变历史证据。
 - C08 PR #6 已合并；故意失败的 PR #7 已关闭、分支已删除。临时 resources.csv.bak 与 resources.csv 的 SHA256 完全相同，整理日志时清除此重复备份，不提交 scratch。
+- C08 required check 实验 PR #9 已关闭、分支已删除；main 的 Check resources strict 保护保留。
 - 没有修改书稿工作树；本地下载产物位于本会话 work/，不提交嵌套仓库、缓存或 scratch。
 
 ## 对上次报告的更正
