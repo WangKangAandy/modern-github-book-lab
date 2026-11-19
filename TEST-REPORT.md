@@ -69,7 +69,24 @@ main protection 已实际设置 `required_status_checks.contexts=["Check resourc
 - 实验窗口在失败后观察 PR API `mergeable_state=blocked`、`merged=false`；本窗口在 PR 关闭后重新读取 API，仍返回上述值及 `state=closed`。[PR 回执](evidence/c08-required-pr9.json)。区分历史阻断观察与当前关闭状态，不冒称再次尝试合并。
 - PR #9 已关闭、未合并；远端分支 GET 返回 404，[清理证据](evidence/c08-required-branch-deleted.txt)。
 
-结论：C08 required check 配置与失败时阻止合并已验证。没有强推、管理员 bypass 或关闭规则来合并失败变更；同一失败 PR 修复转绿仍未执行。
+结论：C08 classic branch protection 的 required check 与 Ruleset 的 required check 均已验证在失败时阻止合并。没有强推、管理员 bypass 或关闭规则来合并失败变更；同一失败 PR 修复转绿仍未执行。
+
+### Ruleset 补测：独立门禁证据
+
+公开 lab 另创建并保留 Ruleset ID `27624499`，target=branch、source=本仓库、enforcement=active，条件只匹配 `refs/heads/main`，包含：
+
+- `pull_request` rule，允许 squash/rebase/merge，审批数 0；
+- `required_status_checks`，context `Check resources`，`strict_required_status_checks_policy=true`；
+- `non_fast_forward`；
+- `current_user_can_bypass=never`。
+
+这与 classic protection 分开记录，避免把两类设置混为一谈。移除重叠 classic protection 后，PR #12 的故意重复 URL 变更仍被 Ruleset 门禁阻断：
+
+- [PR #12](https://github.com/WangKangAandy/modern-github-book-lab/pull/12)：head SHA `816834decf2bf252d9a79a7f9f916d2a62f6252f`，API 快照 `mergeable_state=blocked`、`merged=false`、`state=closed`；
+- [Resource CI 44496259367](https://github.com/WangKangAandy/modern-github-book-lab/actions/runs/44496259367)：Validate catalog failure，后续 Verify artifact skipped；
+- PR #12 已关闭，`test/c08-ruleset-block` 远端分支 GET 404；Ruleset 27624499 保留。
+
+失败日志下载本次为空，不能补造未取得的原始 validator 文本；jobs/PR/Ruleset API 证据足以证明门禁阻断，但不把“日志可见”另行宣称通过。完整响应见 [Ruleset](evidence/c08-ruleset-27624499.json)、[PR](evidence/c08-ruleset-pr12.json)、[run](evidence/c08-ruleset-run.json)、[分支删除](evidence/c08-ruleset-branch-deleted.txt)。
 
 证据：[成功 jobs](evidence/c08-success-run.json)、[CI 失败 jobs](evidence/c08-expected-failure-run.json)、[失败日志](evidence/c08-expected-failure-log.txt)、[Pages 失败 jobs](evidence/c08-pages-expected-failure-run.json)、[PR 状态](evidence/c08-prs.json)、[分支删除回执](evidence/c08-deleted-branch.txt)。
 
