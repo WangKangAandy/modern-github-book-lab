@@ -1,0 +1,44 @@
+name: Resource CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check resources
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run tests
+        run: python -m unittest discover -s . -p 'test_*.py' -v
+      - name: Validate catalog
+        run: python catalog.py resources.csv
+      - name: Build site
+        run: python build.py
+      - name: Upload site
+        uses: actions/upload-artifact@v4
+        with:
+          name: resource-site
+          path: site/
+          if-no-files-found: error
+
+  verify:
+    name: Verify artifact
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: resource-site
+          path: received-site
+      - name: Verify artifact contents
+        run: test -s received-site/index.html
