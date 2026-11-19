@@ -135,6 +135,21 @@ gh aw compile resource-review
 
 C12 结论由“未安装扩展”更新为“本地工具链验证/编译通过，云端模型/凭据仍为账号资格阻断”。**本地编译不证明模型调用、staged 审批或事件链成功**。本次没有云端 run URL，也未收到资格阻断原始报错文本；不编造错误原文或把本地结果升级为云端通过。
 
+## 最终归因审查
+
+| 现象 | 当前归因 | 当前结论 |
+|---|---|---|
+| xallor 私有 lab 的 C08 workflow failure | 实验脚本错误：曾把字面量反引号 `n` 写入 YAML；后续独立 run 只有 `log not found`，没有足够证据归因服务端 | 已用 WangKangAandy 公开 lab 的干净 Resource CI 复核；不归因书稿 |
+| C07 初测 `No module named build` | 实验复制时漏掉 `build.py`，不是书稿资源缺失 | 完整复制五个资源后本地与云端构建通过 |
+| C08 重复 URL failure | 故意注入的无效测试数据，`Catalog error: Line ... duplicate URL` 是预期校验拒绝 | 流程行为正确；不归因书稿 |
+| C02 私有仓库 branch protection 403、C09 私有仓库 Pages 422 | 仓库可见性/账号计划限制 | 改用公开 lab 后 branch protection、Pages 与回滚均通过 |
+| C04 Projects CLI scope | `project/read:project` 未授予，设备授权停在二次验证 | 账号认证阻断；网页 Projects 最小实验成功 |
+| C11 Copilot Cloud Agent | 未取得真实 Cloud Agent 资格入口 | 账号资格阻断；没有伪造 Agent 成功 |
+| C12 gh-aw 云端模型/事件链 | 本地 gh-aw v1.2.2 validate/compile 已成功，但云端模型、凭据和事件链没有真实成功证据 | 本地工具链通过；云端账号资格/凭据阻断 |
+| C08 required check / Ruleset | `Check resources`、strict policy 和 Ruleset 27624499 都实际阻断无效 PR | 门禁已验证；没有把关闭失败 PR 写成修复转绿 |
+
+最终结论：已修复或澄清的失败主要来自实验准备和故意无效输入；仍未完成的项目集中在账号资格、二次验证、云端模型/凭据以及未执行的修复转绿路径。报告没有把这些边界扩大成书稿缺陷，也没有把静态或本地结果升级为云端成功。
+
 ## 清理与保留
 
 - 临时 Project 已关闭，Issue #4 已关闭；三个实验 PR 合并并删除远端分支。
@@ -153,3 +168,4 @@ C12 结论由“未安装扩展”更新为“本地工具链验证/编译通过
 4. 上次未实测的 C01 网页、C03 全部恢复命令、C06 表单加载、Agent 资格等不因本次三项补测而变为通过。
 5. C08 私有 lab 初测的实验脚本错误不归因书稿；公开仓库干净复测确认正常 CI/artifact 路径成功、重复 URL 被拒绝。未完成项仍保留，不将 C08 全章一概标成通过。
 6. C12 “gh-aw 未安装”的旧状态已过时；现为 v1.2.2 本地 validate/compile 成功，云端仍阻断。C08 required check 已通过验证，保留 PR #9 的 blocked/merged=false 与配置证据。
+
