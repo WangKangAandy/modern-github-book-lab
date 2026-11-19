@@ -1,0 +1,17 @@
+[
+  {
+    "headRefOid": "b856427780addf7520f12d9f8eaeace58405a947",
+    "mergeCommit": {
+      "oid": "878ff1788cad5d83214705a5d7cbbc945b60bf02"
+    },
+    "state": "MERGED",
+    "url": "https://github.com/WangKangAandy/modern-github-book-lab/pull/6"
+  },
+  {
+    "headRefName": "test/c08-failure",
+    "headRefOid": "091b03f48bdf0d627e7d23a5b7b31c02e0271d9c",
+    "mergedAt": null,
+    "state": "CLOSED",
+    "url": "https://github.com/WangKangAandy/modern-github-book-lab/pull/7"
+  }
+]
